@@ -1,0 +1,44 @@
+.all-course-page {
+  margin: 25px auto;
+  &__header {
+    padding-top: 30px;
+    color: $color-dark;
+    &__title {
+      font-size: 3rem;
+    }
+    &__statement {
+      max-width: 800px;
+      line-height: 28px;
+      font-size: $font-size-medium;
+      text-indent: 2 * $font-size-medium;
+      margin-top: 30px;
+    }
+  }
+  &__course-list {
+    margin-top: 30px;
+    &__item {
+      margin-bottom: 30px;
+    }
+  }
+
+  &__footer {
+    padding: 20px 0;
+    display: flex;
+    align-items: center;
+    float: right;
+  }
+
+  @media screen and (max-width: 567px) {
+    width: 100%;
+  }
+  @media screen and (max-width: 768px) {
+    width: 90%;
+  }
+  @media screen and (min-width: 992px) {
+    width: 90%;
+    background: $color-white;
+    box-shadow: 0 0 5px 1px $color-weak;
+    border-radius: 4px;
+    padding: 0 20px;
+  }
+}

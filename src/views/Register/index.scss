@@ -1,0 +1,32 @@
+.register-page {
+  width: 100%;
+  &__title {
+    text-align: center;
+    width: 100%;
+    font-size: 2.6rem;
+    font-weight: 600;
+    margin-top: 30px;
+  }
+  &__form-wrapper {
+    margin: 30px auto;
+    box-shadow: 0 2px 12px 0 $color-weak;
+    background: $color-white;
+    width: 100%;
+    padding: 2rem 1.5rem;
+    max-width: 400px;
+
+    button {
+      width: 100%;
+      line-height: 40px;
+      height: 40px;
+    }
+
+    &__footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-top: 20px;
+    }
+  }
+}

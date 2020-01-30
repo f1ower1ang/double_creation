@@ -1,0 +1,88 @@
+.home-page {
+  margin: 0 auto;
+  .ivu-carousel {
+    margin-top: 20px;
+    .home__slider__item {
+      width: 100%;
+      padding-bottom: 45%;
+      position: relative;
+      img {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        height: 100%;
+        top: 0;
+      }
+    }
+  }
+  .home__introduction {
+    margin-top: 20px;
+    &__title {
+      line-height: 80px;
+      font-size: 2.5rem;
+      font-weight: 600;
+      text-align: center;
+      position: relative;
+      &:after {
+        position: absolute;
+        bottom: 0;
+        height: 6px;
+        width: 100%;
+        left: 0;
+        background-color: $color-dark;
+        border-radius: 3px;
+        content: '';
+      }
+    }
+  }
+
+  .home__recommend {
+    &__title {
+      font-size: 2rem;
+      padding: 15px 0;
+      text-align: center;
+    }
+    &__item {
+      border-top: 2px solid $color-weak;
+      .header {
+        align-items: center;
+        justify-content: space-between;
+        display: flex;
+        padding: 10px 0 40px 0;
+        h2 {
+          font-size: 1.6rem;
+          font-weight: bold;
+        }
+        a {
+          font-size: $font-size-medium-s;
+        }
+      }
+      .ivu-row {
+        .ivu-col {
+          margin-bottom: 30px;
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 992px) {
+    width: 80%;
+  }
+  @media screen and (max-width: 576px) {
+    width: 100%;
+  }
+  @media screen and (min-width: 992px) {
+    width: 60%;
+    .home__recommend {
+      margin-left: -25%;
+      margin-right: -25%;
+    }
+  }
+  @media screen and (min-width: 1200px) {
+    width: 50%;
+    .home__recommend {
+      margin-left: -20%;
+      margin-right: -20%;
+    }
+  }
+}

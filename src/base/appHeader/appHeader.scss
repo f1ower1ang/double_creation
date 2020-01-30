@@ -1,0 +1,177 @@
+.app-header {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: $font-size-medium;
+
+  .app-header__logo {
+    font-size: $font-size-large-x;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .app-header__menu {
+    display: flex;
+    justify-content: space-between;
+    max-width: 500px;
+
+    .router-link-exact-active {
+      color: $color-theme;
+    }
+
+    .item {
+      font-weight: 500;
+      justify-content: space-between;
+      padding: 0 30px;
+      transition: all 0.3s ease-in-out;
+
+      &:hover {
+        background: $color-dark;
+        cursor: pointer;
+      }
+      &.router-link-exact-active {
+        position: relative;
+        &:after {
+          content: ' ';
+          position: absolute;
+          bottom: 0;
+          height: 4px;
+          width: 100%;
+          left: 0;
+          background-color: $color-theme;
+        }
+      }
+      .ivu-select-dropdown {
+        background-color: $bg-page-dark;
+        .ivu-dropdown-item {
+          color: $color-white;
+          &:hover {
+            background-color: $color-dark;
+          }
+        }
+      }
+    }
+  }
+
+  .app-header__burger {
+    display: none;
+
+    p {
+      width: 25px;
+      height: 3px;
+      background-color: $color-weak;
+      margin: 4px;
+      transition: 0.3s ease-in-out;
+    }
+  }
+}
+
+$animationList: (
+  1: 0.3s ease-in 0.3s 1 normal forwards running slideIn,
+  2: 0.3s ease-in 0.4s 1 normal forwards running slideIn,
+  3: 0.3s ease-in 0.5s 1 normal forwards running slideIn,
+  4: 0.3s ease-in 0.6s 1 normal forwards running slideIn,
+  5: 0.3s ease-in 0.7s 1 normal forwards running slideIn,
+  6: 0.3s ease-in 0.8s 1 normal forwards running slideIn
+);
+
+@media screen and (min-width: 850px) {
+  .user {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 850px) {
+  .app-header {
+    .app-header__menu {
+      position: fixed;
+      top: 60px;
+      right: 0;
+      bottom: 0;
+      width: 50vw;
+      z-index: 100;
+
+      background-color: $bg-page-dark-capacity;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+
+      transition: all 0.4s ease-in-out;
+      transform: translateX(100%);
+
+      &.open {
+        transform: translateX(0);
+        @each $i, $animation in $animationList {
+          li:nth-child(#{$i}) {
+            animation: $animation;
+          }
+        }
+      }
+
+      .item {
+        padding: 2vh 0;
+        transform: translateX(20px);
+        opacity: 0;
+        box-sizing: border-box;
+        width: 100%;
+        text-align: center;
+        display: block;
+        &:hover {
+          background-color: $bg-page-dark;
+        }
+        &.router-link-exact-active {
+          color: inherit;
+          &:after {
+            width: 0;
+          }
+        }
+        &.user {
+          display: block;
+        }
+        &.hidden {
+          display: none;
+        }
+        .ivu-dropdown {
+          visibility: hidden;
+        }
+      }
+    }
+
+    .app-header__burger {
+      display: block;
+
+      &.active {
+        p {
+          transition: all 0.3s ease-in-out 0.3s;
+        }
+
+        .top-line {
+          transform: rotate(45deg) translate(4px, 6px);
+        }
+
+        .bottom-line {
+          transform: rotate(-45deg) translate(4px, -6px);
+        }
+
+        .center-line {
+          opacity: 0;
+          transform: translateX(10px);
+          transition: 0.3s ease-in-out;
+        }
+      }
+    }
+  }
+  @keyframes slideIn {
+    from {
+      transform: translateX(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+}

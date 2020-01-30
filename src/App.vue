@@ -1,32 +1,62 @@
-<template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
-  </div>
+<template lang="pug">
+  Layout#app
+    Header
+      app-header
+    Content
+      router-view
+    Footer 尾部
 </template>
 
-<style lang="scss">
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
+import appHeader from '@/base/appHeader/appHeader.vue'
+
+@Component({
+  components: {
+    appHeader
+  }
+})
+export default class App extends Vue {
+  private mounted() {
+    this.resetFontSize()
+    window.addEventListener('resize', this.resetFontSize)
+  }
+
+  private resetFontSize() {
+    const html: any = document.querySelector('html')
+    const width = html.getBoundingClientRect().width
+    html.style.fontSize = `${(Math.min(width, 500) / 500) * 16}px`
+  }
 }
+</script>
 
-#nav {
-  padding: 30px;
+<style scoped lang="scss">
+#app {
+  width: 100%;
+  height: 100%;
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+  .ivu-layout-header {
+    background: $bg-page-dark;
+    color: $color-white;
+    padding: 0 20px;
+    line-height: 60px;
+    height: 60px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+  }
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+  .ivu-layout-content {
+    padding: 0 20px;
+    margin-top: 60px;
+    background: $bg-page;
+  }
+
+  .ivu-layout-footer {
+    background: $bg-page-dark;
+    color: $color-white;
+    text-align: center;
   }
 }
 </style>
