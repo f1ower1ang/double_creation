@@ -3,7 +3,10 @@
     Header
       app-header
     Content
-      router-view
+      transition(name="slideIn")
+        keep-alive(v-if="$route.meta.keepAlive")
+          router-view
+        router-view(v-if="!$route.meta.keepAlive")
     Footer 尾部
 </template>
 
@@ -11,11 +14,11 @@
 import { Vue, Component } from 'vue-property-decorator'
 import appHeader from '@/base/appHeader/appHeader.vue'
 
-@Component({
-  components: {
-    appHeader
-  }
-})
+  @Component({
+    components: {
+      appHeader
+    }
+  })
 export default class App extends Vue {
   private mounted() {
     this.resetFontSize()
@@ -30,33 +33,47 @@ export default class App extends Vue {
 }
 </script>
 
-<style scoped lang="scss">
-#app {
-  width: 100%;
-  height: 100%;
-
-  .ivu-layout-header {
-    background: $bg-page-dark;
-    color: $color-white;
-    padding: 0 20px;
-    line-height: 60px;
-    height: 60px;
-    position: fixed;
-    top: 0;
+<style lang="scss" scoped>
+  #app {
     width: 100%;
-    z-index: 10;
+    height: 100%;
+
+    .ivu-layout-header {
+      background: $bg-page-light;
+      color: $color-deep;
+      padding: 0 20px;
+      line-height: 60px;
+      height: 60px;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      box-shadow: 0 0 16px 0 rgba(0,0,0,.18);
+      z-index: 10;
+    }
+
+    .ivu-layout-content {
+      padding: 0 20px;
+      margin-top: 60px;
+      background-color: $bg-page;
+      background-image: url("assets/background.svg");
+      background-repeat: no-repeat;
+      background-position: center 110px;
+      background-attachment: fixed;
+      background-size: 100%;
+    }
+
+    .ivu-layout-footer {
+      background: $bg-page-dark;
+      color: $color-white;
+      text-align: center;
+    }
+  }
+  .slideIn-enter-active {
+    transition: all .4s
+  }
+  .slideIn-enter {
+    transform: translateX(10px);
+    opacity: 0;
   }
 
-  .ivu-layout-content {
-    padding: 0 20px;
-    margin-top: 60px;
-    background: $bg-page;
-  }
-
-  .ivu-layout-footer {
-    background: $bg-page-dark;
-    color: $color-white;
-    text-align: center;
-  }
-}
 </style>

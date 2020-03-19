@@ -1,13 +1,31 @@
+const docker = 'http://175.24.130.223:2375'
 export default {
   course: {
-    default: '/course',
+    default: '/Course/getCourse',
     recommend: '/course/recommend',
-    detail: '/course/detail'
+    detail: '/Course/getCourse',
+    startContainer: '/docker/startContainer',
+    // checkContainer: '/docker/testUploadImageCallBack'
+    // startContainer: docker + '/services/run',
+    checkContainer: docker + '/services/check',
+    rate: '/Course/addCourseRate'
   },
   user: {
     login: '/login',
     register: '/signup',
-    logout: '/logout'
+    logout: '/logout',
+    forget: '/forgetPassword',
+    info: '/user/info',
+    uploadImg: '/upload/userAvater',
+    updateInfo: '/user/updateUserInfo',
+    resetPwd: '/user/changepw',
+    resetEmail: '/verifity/bindEmail',
+    personalCourse: '/userCourse/getUserCourse',
+    addCourse: '/userCourse/addUserCourse',
+    favoriteList: '/userCollection/getUserCollections',
+    addFavorite: '/userCollection/addUserCollection',
+    deleteFavorite: '/userCollection/deleteCollection',
+    deleteCourse: '/userCourse/deleteUserCourse'
   },
   code: {
     emailCode: '/verifity/reSendVerifityEmail',

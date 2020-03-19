@@ -1,0 +1,157 @@
+.profile-page {
+  width: 100%;
+  display: flex;
+  margin: 0 auto;
+
+  &__navbar {
+    width: 100%;
+    .ivu-menu-light {
+      background: transparent;
+    }
+    .ivu-menu {
+      z-index: 0;
+    }
+    .verticalMenu {
+      padding: 0 30px;
+      li {
+        width: 100%;
+        line-height: 40px;
+        border-radius: 20px;
+        text-align: center;
+        margin-top: 30px;
+        font-size: $font-size-medium-s;
+        transition: all .3s;
+        cursor: pointer;
+        &:hover {
+          background: $color-weak;
+          color: #fff;
+        }
+        &.active {
+          background: $color-theme;
+          color: #fff;
+        }
+      }
+    }
+  }
+  &__body {
+    width: 100%;
+    padding: 20px;
+    .ivu-form-item {
+      .ivu-input-wrapper {
+        max-width: 400px;
+      }
+      .avatar {
+        height: 100px;
+        line-height: 100px;
+        display: inline-block;
+      }
+      .ivu-upload {
+        display: inline-block;
+        height: 60px;
+        margin-left: 10px;
+        position: absolute;
+        bottom: 42px;
+        transition: all .3s;
+        cursor: pointer;
+        div {
+          width: 60px;
+          height: 60px;
+          line-height: 60px;
+          text-align: center;
+          border: 1px dashed $color-deep;
+          border-radius: 4px;
+          &:hover {
+            border-color: $color-theme;
+          }
+        }
+      }
+    }
+    &__account {
+      .item {
+        line-height: 60px;
+        display: flex;
+        align-items: center;
+        font-size: $font-size-medium;
+        label {
+          width: 60px;
+          font-size: $font-size-medium-s;
+        }
+        .info {
+          width: 200px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .profile-page {
+    width: 100%;
+    display: block;
+    height: 100%;
+    &__navbar {
+      .horizonMenu {
+        display: block;
+      }
+      .verticalMenu {
+        display: none;
+      }
+    }
+  }
+}
+
+@media (min-width: 576px) {
+  .profile-page {
+    max-width: 100%;
+    display: block;
+    height: 100%;
+    &__navbar {
+      .horizonMenu {
+        display: block;
+      }
+      .verticalMenu {
+        display: none;
+      }
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .profile-page {
+    margin-top: 30px;
+    display: flex;
+    width: 100%;
+    height: calc(100% - 60px);
+    margin-bottom: 30px;
+    &__navbar {
+      background: $bg-page-light;
+      width: 200px;
+      margin-right: 20px;
+      .horizonMenu {
+        display: none;
+      }
+      .verticalMenu {
+        display: block;
+      }
+    }
+    &__body {
+      padding-left: 40px;
+      padding-top: 30px;
+      flex: 1;
+      background: $bg-page-light;
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  .profile-page {
+    max-width: 900px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .profile-page {
+    max-width: 1140px;
+  }
+}
+

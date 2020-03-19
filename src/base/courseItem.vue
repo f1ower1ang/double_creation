@@ -1,14 +1,9 @@
 <template lang="pug">
-  Card(class="course-item" :dis-hover="true")
-    h1(slot="title") {{ course.title }}
-    div.course-item__body
-      p.time
-        app-icon(name="time")
-        span {{ course.time }}
-      p.date {{ course.date }}
-    div.course-item__footer
-      img(:src="course.logo" width="15%")
-      Button(type="warning" @click="enterCourse") 开始
+  div(class="course-item" @click="enterCourse")
+    div.course-item__top
+      img(:src="course.imgUrl" width="100%" height="100%")
+    div.course-item__bottom
+      p.no-wrap {{ course.title }}
 </template>
 
 <script lang="ts">
@@ -16,7 +11,7 @@ interface Course {
   title: string
   time: string
   date: string
-  logo: string
+  imgUrl: string
   id: string
 }
 import { Vue, Component, Prop } from 'vue-property-decorator'
@@ -31,7 +26,8 @@ export default class CourseItem extends Vue {
   })
   course!: Course
   private enterCourse() {
-    this.$router.push(`/course/${this.course.id}`)
+    let routeUrl = this.$router.resolve(`/course/${this.course.id}`)
+    open(routeUrl.href)
   }
 }
 </script>
@@ -39,29 +35,33 @@ export default class CourseItem extends Vue {
 <style scoped lang="scss">
 .course-item {
   margin: 0 auto;
+  height: 210px;
   width: 100%;
-  max-width: 400px;
-  border-bottom: 4px solid $color-theme;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-  &.ivu-card.ivu-card-dis-hover.ivu-card-bordered:hover {
-    border-bottom-color: $color-theme;
+  transition: all .3s;
+  padding: 10px;
+  background: #fff;
+  &__top {
+    width: 100%;
+    height: 160px;
+    background: #e9e9e9;
+    padding: 5%;
+    box-sizing: border-box;
   }
+  &__bottom {
+    width: 100%;
+    p {
+      line-height: 30px;
+      text-align: center;
+    }
+  }
+  &:hover {
+    cursor: pointer;
+    box-shadow: 0 5px 8px rgba(0,0,0,.15);
+    transform: translateY(-5px);
+  }
+
   h1 {
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  .course-item__body {
-    display: flex;
-    justify-content: space-between;
-    color: $color-pl;
-    align-items: center;
-    padding-bottom: 20px;
-  }
-  .course-item__footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    font-size: $font-size-medium-x;
   }
 }
 </style>

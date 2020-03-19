@@ -63,7 +63,9 @@ export default class Register extends Vue {
     }
   }
   validatePhone = (rule: any, value: any, callback: any) => {
-    if (value.length > 0 && !/^1[34578]\d{9}$/.test(value)) {
+    if (value === '') {
+      callback(new Error('请输入手机号'))
+    } else if (value.length > 0 && !/^1[34578]\d{9}$/.test(value)) {
       callback('手机号格式不正确')
     } else {
       callback()

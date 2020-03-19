@@ -1,10 +1,12 @@
 const path = require('path')
+const TerserPlugin = require('terser-webpack-plugin')
+
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' ? '' : '/',
+  publicPath: './',
   outputDir: 'dist',
   assetsDir: 'static',
   filenameHashing: true,
@@ -25,7 +27,7 @@ module.exports = {
     'style-resources-loader': {
       'preProcessor': 'sass',
       'patterns': [
-        resolve('./src/styles/variable.scss'),
+        resolve('./src/styles/variable.scss')
       ]
     }
   },
@@ -39,6 +41,26 @@ module.exports = {
       },
       less: {
         javascriptEnabled: true
+      }
+    }
+  },
+  configureWebpack: (config) => {
+    if (process.env.NODE_ENV === 'production') {
+      // 返回一个将会被合并的对象
+      return {
+        optimization: {
+          minimizer: [
+            new TerserPlugin({
+              sourceMap: false,
+              terserOptions: {
+                compress: {
+                  drop_console: true, // 去除代码中的console
+                  keep_fnames: true // 保持类名不被压缩
+                }
+              }
+            })
+          ]
+        }
       }
     }
   }

@@ -1,21 +1,19 @@
 <template lang="pug">
   .home-page.text-dark
-    carousel(:loop="loop" :dots="dots")
-      carousel-item(v-for="(imgUrl, index) in imgUrls" :key="index")
-        div(class="home__slider__item")
-          img(:src="imgUrl")
-    .home__introduction
-      h1.home__introduction__title amom人工智能实验室
-      introduction(v-for="(item, index) in cardList" :key="index" :card="item")
-    .home__recommend
-      h1.home__recommend__title 个性推荐
-      .home__recommend__item
-        div.header
-          h2 Codelabs
-          router-link(to="/courses") 更多
-        Row(:gutter="20")
-          Col(:xs="24" :sm="24" :md="12" v-for="(course, index) in courseList" :key="index")
-            course(:course="course")
+    .home__bg(ref="bg")
+      img(:src="require('../../assets/home.png')")
+      Button(size="large" type="default" shape="circle" @click="goTo") 立即体验
+      Icon(type="ios-arrow-down")
+    .home__wrapper
+      .home__recommend
+        h1.home__recommend__title {{ title }}
+        .home__recommend__item
+          div.header
+            h2 amomlabs
+            router-link(to="/courses") 更多 >
+          Row(:gutter="20")
+            Col(:xs="24" :sm="24" :md="12" v-for="(course, index) in courseList" :key="index")
+              course(:course="course")
 </template>
 
 <script lang="ts">
@@ -23,7 +21,8 @@ import course from '@/base/courseItem.vue'
 import example from '@/base/exampleItem.vue'
 import introduction from '@/components/Home/introduction.vue'
 import { Vue, Component } from 'vue-property-decorator'
-import { Course, formatCourse } from '@/utils/formatData'
+import { Getter } from 'vuex-class'
+import { Course, formatCourse, User } from '@/utils/formatData'
 import { getRecCourse } from '@/api/courses'
 
 interface IntroductionCard {
@@ -43,24 +42,13 @@ interface Example {
   components: { introduction, course, example }
 })
 export default class Home extends Vue {
-  private imgUrls: Array<string> = ['https://blackwalnutwebsite.oss-cn-hangzhou.aliyuncs.com/public/images/tfboost_2.png']
-  private cardList: Array<IntroductionCard> = [
-    {
-      title: 'Codelabs',
-      statement:
-        '中文名，在线动手实验室，学习者可以在 Codelabs 中实操，通过在云端的在线动手实验室学习或加深开源技术的各个重要知识点，让 TensorFlow去完成我们可以交给人工智能完成的事情，增强人工智能与现有计算思维的结合，帮助学习者实际使用人工智能！',
-      imgUrl:
-        'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNTUyNjE1Nzc5NTAzIiBjbGFzcz0iaWNvbiIgc3R5bGU9IiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjYzMzAiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PHN0eWxlIHR5cGU9InRleHQvY3NzIj48L3N0eWxlPjwvZGVmcz48cGF0aCBkPSJNMjA0LjY2ODQxNiA2MjIuMjMzNmM4Ny41MDA4IDEyNC44NzY4IDE5NC40MDY0IDEyNy45NDg4IDMyMC43NjggOS4xNjQ4IDk3LjUzNi05MS42NDggMTQyLjMzNi04NC40OCAyODAuNTc2IDQxLjgzMDQgMjMuMDQgMjAuOTkyIDM2LjQ1NDQgMTE3LjYwNjQgNDAuMjQzMiAyODkuODQzMkgyMDQuNjY4NDE2TDE0OS42Nzk2MTYgNzQ0LjI5NDQgMjA0LjY2ODQxNiA2MjIuMjMzNnoiIGZpbGw9IiMyMEM5OTciIHAtaWQ9IjYzMzEiPjwvcGF0aD48cGF0aCBkPSJNNjc5LjE5MDAxNiA1MTUuNzg4OGEzNTAuODIyNCAzNTAuODIyNCAwIDAgMC0yMC43MzYtMzUuMzc5MmwtMTguMzI5Ni0yNy4zOTJWMTI2LjgyMjRBNTEuMiA1MS4yIDAgMCAxIDY1MS4xODM2MTYgMjUuNkg3NjcuODY4NDE2YTUxLjIgNTEuMiAwIDAgMSAwIDEwMi40aC0yNS4zNDR2MjkzLjg4OGwxLjAyNCAxLjUzNmMyMC40OCAzMC40NjQgMzguMjk3NiA2Ni4wNDggNTEuNjA5NiAxMDIuODA5NmwxMTQuNjg4IDMxNi41MTg0Qzk0NS45NDIwMTYgOTQyLjA4IDg5Ny40MDQ0MTYgMTAyNCA3OTcuMDUyNDE2IDEwMjRIMjI3LjI5ODgxNkMxMjYuOTQ2ODE2IDEwMjQgNzguNDA5MjE2IDk0Mi4wOCAxMTQuNDAyODE2IDg0Mi43NTJsMTE0LjY4OC0zMTYuNTE4NGE0ODIuMzA0IDQ4Mi4zMDQgMCAwIDEgNTEuNzEyLTEwMi44NjA4bDAuOTcyOC0xLjUzNlYxMjhIMjU1Ljg2ODQxNmE1MS4yIDUxLjIgMCAxIDEgMC0xMDIuNGgxMjAuNTI0OGE1MS4yIDUxLjIgMCAwIDEgNy43ODI0IDEwMS44MzY4djMyNS42MzJsLTE4LjM4MDggMjcuMzQwOGEzODAuMTYgMzgwLjE2IDAgMCAwLTQwLjQ0OCA4MC43NDI0bC0xMi4xMzQ0IDMzLjUzNmM0OS40NTkyIDQ4Ljk0NzIgMTAzLjA2NTYgNDMuNDY4OCAxNzkuNTA3Mi0yMC4xMjE2IDYyLjA1NDQtNTEuNjA5NiAxMjEuODU2LTcxLjczMTIgMTg2LjQ3MDQtNTguNzc3NnogbTUyLjA3MDQgMTM0LjY1NmMtNzIuMzk2OC01MC4wMjI0LTExMi44OTYtNDcuMjA2NC0xNzMuMDU2IDIuODY3Mi0xMDAuOTY2NCA4My45NjgtMTk5LjMyMTYgOTkuMjc2OC0yODEuOTA3MiA0My4yNjRMMjEwLjY1ODgxNiA4NzcuNTY4Yy0xMy4wNTYgMzYuMTQ3Mi04LjM5NjggNDMuOTgwOCAxNi42NCA0My45ODA4aDU2OS43MDI0YzI1LjA4OCAwIDI5LjY5Ni03LjgzMzYgMTYuNTg4OC00My45ODA4bC04Mi4zMjk2LTIyNy4xNzQ0ek01NjMuMDY4NDE2IDMwNy4yYTUxLjIgNTEuMiAwIDEgMSAwLTEwMi40IDUxLjIgNTEuMiAwIDAgMSAwIDEwMi40ek00NjAuNjY4NDE2IDQ2MC44YTUxLjIgNTEuMiAwIDEgMSAwLTEwMi40IDUxLjIgNTEuMiAwIDAgMSAwIDEwMi40eiIgZmlsbD0iIzMzMzMzMyIgcC1pZD0iNjMzMiIgZGF0YS1zcG0tYW5jaG9yLWlkPSJhMzEzeC43NzgxMDY5LjAuaTYiIGNsYXNzPSJzZWxlY3RlZCI+PC9wYXRoPjwvc3ZnPg=='
-    },
-    {
-      title: '案例体验',
-      imgUrl:
-        'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNTUyNjE1OTE5MjA3IiBjbGFzcz0iaWNvbiIgc3R5bGU9IiIgdmlld0JveD0iMCAwIDEwMjUgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjExMjg5IiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgd2lkdGg9IjIwMC4xOTUzMTI1IiBoZWlnaHQ9IjIwMCI+PGRlZnM+PHN0eWxlIHR5cGU9InRleHQvY3NzIj48L3N0eWxlPjwvZGVmcz48cGF0aCBkPSJNMjA4LjEgMzA0LjhjMzcuMyAwIDY5LjQgOCA5Ni42IDIxLjZ2LTI5LjVjMC0xNS42LTEyLjctMjguMy0yOC4zLTI4LjNIMTMwLjNjLTE1LjYgMC0yOC4zIDEyLjctMjguMyAyOC4zdjM0LjRjMjkuMS0xNi42IDY0LjQtMjYuNSAxMDYuMS0yNi41ek04MjAuOSAzMDQuOGMtMzcuMyAwLTY5LjQgOC05Ni42IDIxLjZ2LTI5LjVjMC0xNS42IDEyLjctMjguMyAyOC4zLTI4LjNoMTQ2LjJjMTUuNiAwIDI4LjMgMTIuNyAyOC4zIDI4LjN2MzQuNGMtMjkuMi0xNi42LTY0LjUtMjYuNS0xMDYuMi0yNi41eiIgZmlsbD0iIzU0QThCOSIgcC1pZD0iMTEyOTAiPjwvcGF0aD48cGF0aCBkPSJNODQ0LjUgNDU0LjRjMTQuOC0xNC44IDE0LjgtMzguOCAwLTUzLjUtMTQuOC0xNC44LTM4LjgtMTQuOC01My41IDAtMTQuOCAxNC44LTE0LjggMzguOCAwIDUzLjUgMTQuNyAxNC44IDM4LjcgMTQuOCA1My41IDB6IiBmaWxsPSIjRjc5NjMzIiBwLWlkPSIxMTI5MSI+PC9wYXRoPjxwYXRoIGQ9Ik05NDMuNSA0OTkuOWMtMTQuOC0xNC44LTM4LjctMTQuOC01My41IDAtMTQuOCAxNC44LTE0LjggMzguOCAwIDUzLjUgMTQuOCAxNC44IDM4LjggMTQuOCA1My41IDAgMTQuOC0xNC43IDE0LjgtMzguNyAwLTUzLjV6TTY5Ni42IDQ5NS4yYy0xNC44IDE0LjgtMTQuOCAzOC44IDAgNTMuNSAxNC44IDE0LjggMzguOCAxNC44IDUzLjUgMCAxNC44LTE0LjggMTQuOC0zOC44IDAtNTMuNS0xNC44LTE0LjctMzguOC0xNC43LTUzLjUgMHoiIGZpbGw9IiMxYWZhMjkiIHAtaWQ9IjExMjkyIiBkYXRhLXNwbS1hbmNob3ItaWQ9ImEzMTN4Ljc3ODEwNjkuMC5pMTUiIGNsYXNzPSIiPjwvcGF0aD48cGF0aCBkPSJNNzk1LjYgNTk0LjNjLTE0LjggMTQuOC0xNC44IDM4LjggMCA1My41IDE0LjggMTQuOCAzOC44IDE0LjggNTMuNiAwIDE0LjgtMTQuOCAxNC44LTM4LjggMC01My41LTE0LjktMTQuOC0zOC44LTE0LjgtNTMuNiAweiIgZmlsbD0iIzU0QThCOSIgcC1pZD0iMTEyOTMiPjwvcGF0aD48cGF0aCBkPSJNMTc0LjEgMzc5LjZjLTMuOSAwLTcuMSAzLjItNy4xIDcuMXY0MS45YzAgMy45IDIuNSA5LjEgNS41IDExLjVsMjguNSAyMi44YzMgMi40IDggMi40IDExIDBsMjguNi0yMi44YzMtMi40IDUuNS03LjYgNS41LTExLjV2LTQxLjljMC0zLjktMy4yLTcuMS03LjEtNy4xaC02NC45ek02MiA1NTYuNmMwIDMuOSAzLjIgNy4xIDcuMSA3LjFIMTExYzMuOSAwIDkuMS0yLjUgMTEuNS01LjVsMjIuOC0yOC41YzIuNS0zIDIuNS04IDAtMTFsLTIyLjgtMjguNmMtMi40LTMtNy42LTUuNS0xMS41LTUuNUg2OWMtMy45IDAtNy4xIDMuMi03LjEgNy4xdjY0Ljl6TTIzOS4xIDY2OC44YzMuOSAwIDcuMS0zLjIgNy4xLTcuMXYtNDEuOWMwLTMuOS0yLjUtOS4xLTUuNS0xMS41bC0yOC41LTIyLjhjLTMtMi40LTgtMi40LTExIDBsLTI4LjUgMjIuOGMtMyAyLjQtNS41IDcuNi01LjUgMTEuNWwtMC4xIDQxLjljMCAzLjkgMy4yIDcuMSA3LjEgNy4xaDY0Ljl6TTM1MS4yIDQ5MS43YzAtMy45LTMuMi03LjEtNy4xLTcuMWgtNDEuOWMtMy45IDAtOSAyLjUtMTEuNSA1LjVsLTIyLjggMjguNWMtMi40IDMtMi40IDggMCAxMWwyMi44IDI4LjVjMi40IDMgNy42IDUuNSAxMS41IDUuNWw0MS45IDAuMWMzLjkgMCA3LjEtMy4yIDcuMS03LjF2LTY0Ljl6IiBmaWxsPSIjZDgxZTA2IiBwLWlkPSIxMTI5NCIgZGF0YS1zcG0tYW5jaG9yLWlkPSJhMzEzeC43NzgxMDY5LjAuaTE0IiBjbGFzcz0iIj48L3BhdGg+PHBhdGggZD0iTTc3Ni4xIDE2LjNjLTkyIDAtMTYyLjggMjYuNS0yMTAuNSA3OC43LTYzLjQgNjkuNC02NS41IDE2MS43LTY0LjUgMTg5LjJoMjguM2MtMC43LTIxLjcgMC4yLTEwOCA1Ny4zLTE3MC4zIDQyLjEtNDYgMTA1LjktNjkuMyAxODkuNC02OS4zIDcuOCAwIDE0LjEtNi4zIDE0LjEtMTQuMXMtNi4zLTE0LjItMTQuMS0xNC4yeiIgZmlsbD0iIzYyNjI2NCIgcC1pZD0iMTEyOTUiPjwvcGF0aD48cGF0aCBkPSJNODE0LjEgMzE0LjNjLTQ0LjkgMC04Ni40IDE0LjEtMTIwLjYgMzcuOWgtMjEuOWMtNS4yLTE4LjEtMjEuNy0zMS40LTQxLjUtMzEuNEg1ODd2LTEuNmMwLTE1LjYtMTIuNy0yOC4zLTI4LjMtMjguM2gtODcuMmMtMTUuNiAwLTI4LjMgMTIuNy0yOC4zIDI4LjN2MS42aC00Ni45Yy0xOS44IDAtMzYuMiAxMy4zLTQxLjUgMzEuNGgtMjEuOWMtMzQuMi0yMy45LTc1LjctMzcuOS0xMjAuNi0zNy45LTExNi42IDAtMjExLjEgOTQuNS0yMTEuMSAyMTEuMXY0MjQuMmMwIDQ3IDQwIDc5LjIgOTMuNiAxOS45IDUwLjYtNTUuOSAxOTIuOS0xOTUuOSAyNTcuOS0yNjguMiAxLTAuOSAyLTEuOSAzLjEtMi44IDE0LjggMTUgMzUuMyAyNC40IDU4IDI0LjQgMzcuNyAwIDY5LjItMjUuOCA3OC40LTYwLjZoNDJjOS4zIDM0LjggNDAuNyA2MC42IDc4LjQgNjAuNiAyMi43IDAgNDMuMi05LjMgNTgtMjQuNCAxIDEgMi4xIDEuOSAzLjEgMi44IDY1IDcyLjMgMjA3LjMgMjEyLjMgMjU3LjkgMjY4LjIgNTMuNiA1OS4zIDkzLjYgMjcuMSA5My42LTE5LjlWNTI1LjRjMC0xMTYuNi05NC41LTIxMS4xLTIxMS4xLTIxMS4xek0yMDYuNiA3MDRjLTk5LjMgMC0xNzkuOC04MC41LTE3OS44LTE3OS44czgwLjUtMTc5LjggMTc5LjgtMTc5LjhjOTkuMyAwIDE3OS44IDgwLjUgMTc5LjggMTc5LjhTMzA1LjkgNzA0IDIwNi42IDcwNHogbTI3MC4xLTgzLjNjMCAzLjctMi44IDUuNi02LjMgNC4ybC00My4xLTE4Yy0zLjUtMS41LTMuNS0zLjggMC01LjNsNDMuMS0xOGMzLjQtMS40IDYuMyAwLjQgNi4zIDQuMnYzMi45ek01OTkgNjA2LjlsLTQzIDE4Yy0zLjUgMS40LTYuMy0wLjQtNi4zLTQuMnYtMzIuOGMwLTMuNyAyLjgtNS42IDYuMy00LjJsNDMgMThjMy41IDEuNCAzLjUgMy43IDAgNS4yek04MTkuOSA3MDRjLTk5LjMgMC0xNzkuOC04MC41LTE3OS44LTE3OS44czgwLjUtMTc5LjggMTc5LjgtMTc5LjhjOTkuMyAwIDE3OS44IDgwLjUgMTc5LjggMTc5LjhTOTE5LjIgNzA0IDgxOS45IDcwNHoiIGZpbGw9IiMxMjk2ZGIiIHAtaWQ9IjExMjk2IiBkYXRhLXNwbS1hbmNob3ItaWQ9ImEzMTN4Ljc3ODEwNjkuMC5pMTMiIGNsYXNzPSJzZWxlY3RlZCI+PC9wYXRoPjwvc3ZnPg==',
-      statement:
-        'AI入门第一步是体验，你可以在这里体验到使用 TensorFlow等技术的相关案例，在体验中感受到人工智能的智慧与强大，培养对人工智能的认识和了解，认识到什么是人工智能以及它的你能力范畴；培养人工智能相关的思维方法，把计算思维、数据思维和人工智能思维通过案例的体验来交互'
-    }
-  ]
   private courseList: Array<Course> = []
+  public $refs!: {
+    bg: HTMLBaseElement
+  }
+
+  @Getter userInfo: User | undefined
+
   private created() {
     getRecCourse().then((res: any) => {
       res.data.forEach((item: any) => {
@@ -68,11 +56,23 @@ export default class Home extends Vue {
       })
     })
   }
-  private get loop(): boolean {
-    return this.imgUrls.length !== 1
+  private mounted() {
+    const { offsetHeight, offsetWidth } = this.$refs.bg
+    if (offsetWidth < offsetHeight) {
+      const img: HTMLBaseElement = this.$refs.bg.firstChild as HTMLBaseElement
+      img.style.height = 'auto'
+      img.style.width = '100%'
+    }
   }
-  private get dots(): string {
-    return this.imgUrls.length === 1 ? 'none' : 'inside'
+  private get title(): string {
+    return this.userInfo ? '个性化推荐' : '热门推荐'
+  }
+  private goTo() {
+    if (this.userInfo) {
+      this.$router.push('/courses')
+    } else {
+      this.$router.push('/login?redirect=/')
+    }
   }
 }
 </script>

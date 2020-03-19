@@ -1,0 +1,241 @@
+<template lang="pug">
+  div.profile-page(v-if="userInfo")
+    div.profile-page__navbar
+      ul.verticalMenu
+        li(:class="{active: name === 'primary-info'}" @click="setName('primary-info')") 基本信息
+        li(:class="{active: name === 'account-info'}" @click="setName('account-info')") 账号密码
+      Menu(mode="horizontal" :active-name="name" class="horizonMenu" @on-select="setName")
+        MenuItem(name="primary-info") 基本信息
+        MenuItem(name="account-info") 账号密码
+    div.profile-page__body
+      Form(:model="primaryInfo" label-position="left" :label-width="60" v-show="name=== 'primary-info'")
+        FormItem(label="头像" style="height: 120px; margin-bottom: 50px")
+          div.avatar
+            img(:src="avatar" height="100" width="100")
+          Upload(
+            :format="['jpg','jpeg','png']"
+            :max-size="2048"
+            action="hhh"
+            :before-upload="handleBeforeUpload "
+          )
+            div(style="")
+              Icon(type="ios-camera" size="20")
+          p.text-weak.no-wrap 只能上传jpg/png/jpeg文件，且不超过1Mb
+        FormItem(label="账户名")
+          Input(v-model="primaryInfo.account" readonly)
+        FormItem(label="性别")
+          RadioGroup(v-model="primaryInfo.sex")
+            Radio(:label="1") 男
+            Radio(:label="0") 女
+        FormItem(label="昵称")
+          Input(v-model="primaryInfo.name")
+        FormItem
+          Button(type="primary" @click="saveEdit") 保存
+      ul.profile-page__body__account(v-show="name === 'account-info'")
+        li.item
+          label 手机
+          p.info.no-wrap {{ accountInfo.phone }}
+          a.btn(@click="modal1 = true") 点击修改
+        li.item
+          label 邮箱
+          p.info.no-wrap {{ accountInfo.email }}
+          a.btn(@click="modal2 = true") 点击修改
+        li.item
+          label 密码
+          p.info.no-wrap ******
+          a.btn(@click="modal3 = true") 点击修改
+
+    Modal(v-model="modal1" @on-ok="changePhone"  title="修改手机")
+    Modal(v-model="modal2" @on-ok="changeEmail"  title="修改邮箱" :loading="true" ref="modal2")
+      Form(:model="emailForm" :rules="emailRule" ref="emailForm")
+        FormItem(label="邮箱" prop="email")
+          Input(type="email" v-model="emailForm.email")
+    Modal(v-model="modal3" @on-ok="changePwd" title="修改密码" :loading="true" ref="modal3")
+      Form(:model="pwdForm" label-position="top" :rules="pwdRule" ref="pwdForm")
+        FormItem(label="当前密码" prop="oldPassword")
+          Input(type="password" v-model="pwdForm.oldPassword")
+        FormItem(label="新密码" prop="newPassword")
+          Input(type="password" v-model="pwdForm.newPassword")
+        FormItem(label="确认密码" prop="confirmNewPassword")
+          Input(type="password" v-model="pwdForm.confirmNewPassword")
+
+</template>
+
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
+import { Getter } from 'vuex-class'
+import { defaultBaseUrl } from '@/utils/http'
+import path from '@/utils/path'
+import { uploadAvatar, editInfo, getInfo, resetPwd, resetEmail } from '@/api/user'
+import { checkImage } from '@/utils/image'
+import { Form } from 'view-design'
+import { User } from '@/utils/formatData'
+
+@Component
+export default class Profile extends Vue{
+  private primaryInfo: any = {
+    name: '',
+    account: '',
+    sex: 0
+  }
+  private accountInfo: any = {
+    phone: '',
+    email: ''
+  }
+  private name: string = 'primary-info'
+  private avatar: string = ''
+  private uploadUrl: string = defaultBaseUrl + path.user.uploadImg
+  private uploadFile: File | null = null
+  private imageTypes: string[] = ['jpg', 'jpeg', 'png']
+
+  public $refs!: {
+    pwdForm: Form,
+    emailForm: Form,
+    modal3: any,
+    modal2: any
+  }
+  private modal1: boolean = false
+  private modal2: boolean = false
+  private modal3: boolean = false
+
+  private pwdForm: any = {
+    oldPassword: '',
+    newPassword: '',
+    confirmNewPassword: ''
+  }
+  private pwdRule: any = {
+    oldPassword: [
+      { required: true, message: '请输入密码', trigger: 'blur' }
+    ],
+    newPassword: [
+      { required: true, validator: this.validatePass, trigger: 'blur' }
+    ],
+    confirmNewPassword: [
+      { required: true, validator: this.validatePassCheck, trigger: 'blur' }
+    ]
+  }
+  private emailForm: any = {
+    email: ''
+  }
+  private emailRule: any = {
+    email: [
+      { required: true, message: '请输入邮箱', trigger: 'blur' },
+      { type: 'email', message: '邮箱地址不正确', trigger: 'blur' }
+    ]
+  }
+  private phoneForm: any = {
+    phone: ''
+  }
+
+  validatePass(rule: any, value: any, callback: any) {
+    if (value === '') {
+      return callback(new Error('请输入新密码'));
+    }
+    if (this.pwdForm.confirmNewPassword.length > 0) {
+      // 对第二个密码框单独验证
+      this.$refs.pwdForm.validateField('confirmNewPassword');
+    }
+    callback()
+  }
+  validatePassCheck(rule: any, value: any, callback: any){
+    if (value === '') {
+      callback(new Error('请输入密码'));
+    } else if (value !== this.pwdForm.newPassword) {
+      callback(new Error('两次输入密码不一致'));
+    } else {
+      callback();
+    }
+  }
+
+  @Getter userInfo: User | undefined | null
+
+  mounted() {
+    if (this.userInfo) {
+      this.primaryInfo = {
+        name: this.userInfo.name,
+        account: this.userInfo.account,
+        sex: this.userInfo.sex
+      }
+      this.avatar = this.userInfo.avatar
+      this.accountInfo = {
+        phone: this.userInfo.phone,
+        email:this.userInfo.email
+      }
+    }
+  }
+
+  private setName(name: string) {
+    this.name = name
+  }
+  private handleBeforeUpload(file: File) {
+    this.uploadFile = file
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => {
+      const _base64 = reader.result
+      this.avatar = _base64  as string //将_base64赋值给图片的src，实现图片预览
+    }
+    return false
+  }
+  private async saveEdit() {
+    try {
+      if (this.uploadFile) {
+        if (checkImage(this.uploadFile, this.imageTypes, 1)) {
+          const res: any = await uploadAvatar(this.uploadFile)
+          if (res.errMsg !== '成功') {
+            this.$Message.warning('图片类型或大小不符合')
+            return
+          }
+        } else {
+          this.$Message.warning('图片类型或大小不符合')
+          return
+        }
+      }
+      await editInfo({ sex: this.primaryInfo.sex, name: this.primaryInfo.name })
+      await this.$store.dispatch('user/getInfo')
+      this.$Message.success('更新成功')
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  private changePhone() {
+  }
+  private changeEmail() {
+    this.$refs['modal2'].buttonLoading = false
+    this.$refs['emailForm'].validate((valid: boolean | any) => {
+      if (valid) {
+        resetEmail(this.emailForm).then((res: any) => {
+          console.log(res)
+        }).catch((e) => {
+          console.error(e)
+        })
+      }
+    })
+  }
+  private changePwd() {
+    this.$refs['modal3'].buttonLoading = false
+    this.$refs['pwdForm'].validate((valid: boolean | any) => {
+      if (valid) {
+        resetPwd(this.pwdForm).then((res: any) => {
+          if (res.errCode !== 200) {
+            this.$Message.error(res.errMsg)
+          } else {
+            this.$Message.success('修改成功，将跳转至登录页面')
+            setTimeout(() => {
+              this.$router.push(`/login?redirect=${this.$route.path}`)
+              this.$store.dispatch('user/removeUser')
+            }, 1500)
+          }
+        }).catch(() => {
+          this.$Message.error('修改失败')
+        })
+      }
+    })
+  }
+}
+</script>
+
+<style scoped lang="scss">
+@import "profile";
+</style>

@@ -1,5 +1,96 @@
 .course-page {
   color: $color-deep;
+  background: $bg-page;
+  margin: 20px auto;
+  box-sizing: border-box;
+  &__left {
+    flex: 1;
+    width: 100%;
+    .common-content {
+      margin-bottom: 10px;
+      padding: 30px 30px 20px;
+      border: 1px solid #eee;
+      background: #fff;
+      .course-title {
+        font-size: $font-size-large;
+        margin-bottom: 10px;
+      }
+      .info-meta {
+        color: $color-weak;
+        margin-bottom: 15px;
+        span+span:before {
+          content: "";
+          width: 1px;
+          height: 30px;
+          display: inline-block;
+          background: #eee;
+          margin: 0 8px -9px 8px;
+        }
+      }
+      .info-desc {
+        margin-bottom: 10px;
+        font-size: $font-size-medium-s;
+      }
+      .section-title {
+        font-size: $font-size-large-s;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+      }
+    }
+  }
+  &__right {
+    padding: 5px;
+    background: #fff;
+    .bg {
+      width: 100%;
+      padding-bottom: 60%;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      background-position: center;
+      margin: 0 auto;
+    }
+    .wrapper {
+      border-bottom: 1px solid #eee;
+      width: 90%;
+      margin: 0 auto;
+      padding: 20px 0;
+      p {
+        font-size: $font-size-medium;
+        text-align: left;
+        width: 100%;
+        margin: 10px auto;
+        color: $color-deep
+      }
+      .ivu-btn {
+        margin-top: 10px;
+        &:last-child {
+          text-align: left;
+          color: $color-weak;
+          &:focus {
+            border: none;
+            box-shadow: none;
+          }
+          &:hover {
+            color: $color-theme
+          }
+        }
+      }
+    }
+    .btn {
+      width: 90%;
+      margin: 10px auto;
+      font-size: $font-size-medium;
+      text-align: center;
+      cursor: pointer;
+      color: $color-pl;
+      .ivu-icon {
+        font-size: $font-size-large;
+        margin-right: 5px;
+      }
+    }
+  }
+
   &__header {
     background: #fff;
     height: 250px;
@@ -27,11 +118,15 @@
     }
     &__btn {
       margin-top: 30px;
-
       height: 45px;
       line-height: 45px;
-      min-width: 200px;
-      font-size: $font-size-medium;
+      .ivu-btn {
+        font-size: $font-size-medium;
+        &:first-child {
+          min-width: 150px;
+          margin-right: 20px;
+        }
+      }
     }
   }
   &__content {
@@ -53,19 +148,85 @@
           margin-top: 25px;
           line-height: 22px;
         }
+        .tui-editor-contents {
+          margin-top: 25px;
+        }
       }
     }
+  }
 
-    @media screen and (max-width: 576px) {
-      width: 100%;
+  @media (min-width: 576px) {
+    max-width: 540px;
+  }
+
+  @media (min-width: 768px) {
+    max-width: 720px;
+    display: flex;
+    .course-page__right {
+      width: 210px;
+      margin-left: 10px;
+    }
+  }
+
+  @media (min-width: 992px) {
+    max-width: 960px;
+    .course-page__right {
+      width: 280px;
+    }
+  }
+
+  @media (max-width: 1200px) and (min-width: 992px) {
+    max-width: 1000px;
+  }
+
+  @media (min-width: 1200px) {
+    max-width: 1140px;
+    .course-page__right {
+      width: 315px;
+    }
+  }
+
+
+  .run-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: $bg-page-dark-capacity;
+    z-index: 1000;
+    .message {
+      text-align: center;
+      color: #fff;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      .ivu-icon {
+        animation: loading-rotate 5s linear infinite;
+        font-size: 50px;
+        color: $color-theme;
+      }
+      p {
+        margin-top: 5px;
+        color: $color-pl;
+      }
+    }
+    &.fade-enter-active, &.fade-leave-active {
+      transition: opacity .5s;
+    }
+    &.fade-enter, &.fade-leave-to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes loading-rotate {
+    from {
+      transform: rotate(0);
     }
 
-    @media screen and (max-width: 768px) {
-      width: 90%;
-    }
-
-    @media screen and (min-width: 768px) {
-      width: 75%;
+    to {
+      transform: rotate(360deg);
     }
   }
 }

@@ -7,7 +7,7 @@
   font-size: $font-size-medium;
 
   .app-header__logo {
-    font-size: $font-size-large-x;
+    height: 100%;
     &:hover {
       cursor: pointer;
     }
@@ -29,7 +29,7 @@
       transition: all 0.3s ease-in-out;
 
       &:hover {
-        background: $color-dark;
+        background: $bg-bar;
         cursor: pointer;
       }
       &.router-link-exact-active {
@@ -45,11 +45,11 @@
         }
       }
       .ivu-select-dropdown {
-        background-color: $bg-page-dark;
+        background-color: $bg-page-light;
         .ivu-dropdown-item {
-          color: $color-white;
+          color: $color-deep;
           &:hover {
-            background-color: $color-dark;
+            background-color: $bg-bar;
           }
         }
       }
@@ -62,7 +62,7 @@
     p {
       width: 25px;
       height: 3px;
-      background-color: $color-weak;
+      background-color: $color-deep;
       margin: 4px;
       transition: 0.3s ease-in-out;
     }
@@ -90,11 +90,10 @@ $animationList: (
       position: fixed;
       top: 60px;
       right: 0;
-      bottom: 0;
-      width: 50vw;
-      z-index: 100;
+      width: 200px;
+      z-index: 9999;
 
-      background-color: $bg-page-dark-capacity;
+      background-color: $bg-page-light-capacity;
       flex-direction: column;
       justify-content: flex-start;
       align-items: center;
@@ -120,7 +119,7 @@ $animationList: (
         text-align: center;
         display: block;
         &:hover {
-          background-color: $bg-page-dark;
+          background-color: $bg-bar;
         }
         &.router-link-exact-active {
           color: inherit;

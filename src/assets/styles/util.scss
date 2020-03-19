@@ -228,6 +228,13 @@ div.dib {
   margin-bottom: 15px;
 }
 
+// 单行显示
+.no-wrap {
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}
+
 // 按钮禁用
 .disabled {
   outline: 0 none;
