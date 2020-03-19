@@ -99,7 +99,7 @@ export default class CourseDetail extends Vue {
       await addUserCourse(this.course.id)
       this.loading = true
       const res: any = await startContainer({ courseId: this.course.id, userId: this.userInfo.id })
-      if (res.code >= 200 && res.code < 300) {
+      if (res.errCode >= 200 && res.errCode < 300) {
         const res: any = await checkContainer({ courseId: this.course.id, userId: this.userInfo.id })
         if (res.code !== 200) {
           let timer = setInterval(async() => {
