@@ -20,7 +20,7 @@
       position: absolute;
       top: 55%;
       left: 50%;
-      transform: translate(calc(-50% + 13px), -50%);
+      transform: translate(-50%, -50%);
       background-color: transparent;
       border: 1px solid $color-theme;
       color: $color-theme;
@@ -118,24 +118,24 @@
   }
   @keyframes upDown {
     0% {
-      transform: translate(calc(-50% + 14px), 5px);
+      transform: translate(-50%, 5px);
     }
 
     50% {
-      transform: translate(calc(-50% + 14px), 30px);
+      transform: translate(-50%, 30px);
     }
 
     100% {
-      transform: translate(calc(-50% + 14px), 5px);
+      transform: translate(-50%, 5px);
     }
   }
   @keyframes slideIn {
     from {
-      transform: translate(calc(-50% + 13px), calc(-50% - 10px));
+      transform: translate(-50%, calc(-50% - 10px));
       opacity: 0;
     }
     to {
-      transform: translate(calc(-50% + 13px), -50%);
+      transform: translate(-50%, -50%);
       opacity: 1;
     }
   }
