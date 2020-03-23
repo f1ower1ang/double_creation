@@ -1,7 +1,7 @@
 <template lang="pug">
   div(class="course-item" @click="enterCourse")
     div.course-item__top
-      img(:src="course.imgUrl" width="100%" height="100%")
+      img(v-lazy="course.imgUrl" width="100%" height="100%")
     div.course-item__bottom
       p.no-wrap {{ course.title }}
 </template>
