@@ -72,7 +72,7 @@
         align-items: center;
         justify-content: space-between;
         display: flex;
-        padding: 10px 0 40px 0;
+        padding-top: 10px;
         h2 {
           font-size: 1.5rem;
         }
@@ -81,6 +81,11 @@
         }
       }
       .ivu-row {
+        padding-top: 20px;
+        min-height: calc(100vh - 104px - 80px);
+        .ivu-spin-fix {
+          background-color: rgba(255, 255, 255, .5);
+        }
         .ivu-col {
           margin-bottom: 30px;
         }
@@ -96,6 +101,11 @@
   @media screen and (max-width: 576px) {
     .home__wrapper {
       width: 100%;
+      .home__recommend__item {
+        .ivu-row {
+          min-height: calc(100vh - 37px - 114px);
+        }
+      }
     }
   }
   @media screen and (min-width: 992px) {
@@ -104,6 +114,10 @@
       .home__recommend {
         margin-left: -25%;
         margin-right: -25%;
+        .home__recommend__item {
+          width: 90%;
+          margin: 0 auto;
+        }
       }
     }
   }

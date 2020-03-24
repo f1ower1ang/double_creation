@@ -86,28 +86,30 @@ export default class User extends Vue{
 
   private async handleCourse() {
     let list: any = []
-    const res: any = await getUserCourse({ pages: this.page, size: this.limit })
-    if (res.data === '用户没有学习记录') {
-      return {
-        flag: false,
-        list
-      }
-    }
-    const { courses, pages } = res.data
-    if (courses.length !== 0) {
-      let records = pages.records.filter((item: any) => item.deleted !== 1)
-      records.forEach((record: any) => {
-        const index = courses.findIndex((course: any) => course.id === record.courseid)
-        if (index > -1) {
-          let obj = formatCourse(courses[index])
-          obj.date = record.replacetime
-          obj.recordId = record.id
-          list.unshift(obj)
+    let flag: boolean = false
+    try {
+      const res: any = await getUserCourse({ pages: this.page, size: this.limit })
+      if (res.data !== '用户没有学习记录') {
+        const { courses, pages } = res.data
+        if (courses.length !== 0) {
+          let records = pages.records.filter((item: any) => item.deleted !== 1)
+          records.forEach((record: any) => {
+            const index = courses.findIndex((course: any) => course.id === record.courseid)
+            if (index > -1) {
+              let obj = formatCourse(courses[index])
+              obj.date = record.replacetime
+              obj.recordId = record.id
+              list.unshift(obj)
+            }
+          })
+          flag = true
         }
-      })
+      }
+    } catch (e) {
+      flag = false
     }
     return {
-      flag: true,
+      flag,
       list
     }
   }

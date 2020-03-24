@@ -1,8 +1,10 @@
 const docker = 'http://175.24.130.223:2375'
+const rec = 'http://120.76.43.212:10011'
 export default {
   course: {
     default: '/Course/getCourse',
-    recommend: '/course/recommend',
+    recommendWidthLogin: '/userRecommend/getUserRecommend',
+    recommend: '/userRecommend/getUserRecommendWithOutToken',
     detail: '/Course/getCourse',
     startContainer: '/docker/startContainer',
     // checkContainer: '/docker/testUploadImageCallBack'

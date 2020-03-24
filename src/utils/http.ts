@@ -1,5 +1,5 @@
 // utils/http.js 文件
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 // @ts-ignore
 import * as auth from './auth'
 import router from '@/router'
@@ -32,29 +32,31 @@ request.interceptors.request.use(
   }
 )
 
-// http response 拦截器
-axios.interceptors.response.use(
-  (response) => {
-    const { path, meta } = router.history.current
-    if (meta.auth && response.data.errCode === 401 && path !== '/login' && response.data.errMsg !== '旧密码输入不正确') {
-      Vue.prototype.$Message.error('当前未登录，跳转登录页面进行登录')
-      store.dispatch('user/removeUser')
-      router.push(`/login?redirect=${path}`)
-      return Promise.reject(response)
-    }
-    return response
-  },
-  (error) => {
-    const path = router.history.current.path
-    if (error.response.status === 401) {
-      Vue.prototype.$Message.error('当前未登录，跳转登录页面进行登录')
-      store.dispatch('user/removeUser')
-      router.push(`/login?redirect=${path}`)
-    }
-    const data = error.response.data
-    return Promise.reject(data || error)
+const onResponseSuccess = (response: AxiosResponse) => {
+  const { path, meta } = router.history.current
+  if (meta.auth && response.data.errCode === 401 && path !== '/login' && response.data.errMsg !== '旧密码输入不正确') {
+    Vue.prototype.$Message.error('当前未登录，跳转登录页面进行登录')
+    store.dispatch('user/removeUser')
+    router.push(`/login?redirect=${path}`)
+    return Promise.reject(response)
   }
-)
+  return response
+}
+
+const onResponseError = (error: any) => {
+  const path = router.history.current.path
+  if (error.response.status === 400) {
+    Vue.prototype.$Message.error('当前未登录，跳转登录页面进行登录')
+    store.dispatch('user/removeUser')
+    router.push(`/login?redirect=${path}`)
+  }
+  const data = error.response.data
+  return Promise.reject(data || error)
+}
+
+// http response 拦截器
+axios.interceptors.response.use(onResponseSuccess, onResponseError)
+request.interceptors.response.use(onResponseSuccess, onResponseError)
 
 export default request
 

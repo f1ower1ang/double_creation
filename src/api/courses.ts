@@ -6,8 +6,12 @@ export function getAllCourse(params: object) {
   return axios.get(path.course.default, { params }).then(res => Promise.resolve(res.data))
 }
 
-export function getRecCourse() {
-  return get(path.course.recommend)
+export function getRecCourse(login: boolean = false) {
+  if (!login) {
+    return axios.get(path.course.recommend).then(res => Promise.resolve(res.data))
+  } else {
+    return get(path.course.recommendWidthLogin)
+  }
 }
 
 export function getCourseDetail(id: string) {

@@ -42,7 +42,7 @@ export function resetEmail(data: object) {
 }
 
 export function getUserCourse(data: object) {
-  return get(path.user.personalCourse, data)
+  return get(path.user.personalCourse, data, {errorHandle: false})
 }
 
 export function addUserCourse(courseId: string) {
