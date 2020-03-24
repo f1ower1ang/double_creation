@@ -61,6 +61,24 @@ export const constantRoutes = [
     component: () => import('../views/User/profile.vue')
   },
   {
+    path: '/verifyForgetPwd',
+    name: 'forgetPwd',
+    component: () => import('../views/Redirect/forgetPwd.vue')
+  },
+  {
+    path: '/verifyRegister',
+    name: 'verifyRegister',
+    component: () => import('../views/Redirect/verifyRegister.vue')
+  },
+  {
+    path: '/verifyEmail',
+    name: 'verifyEmail',
+    component: () => import('../views/Redirect/verifyEmail.vue'),
+    meta: {
+      keepAlive: true
+    }
+  },
+  {
     path: '/404',
     component: () => import('../views/404.vue'),
     name: 404,

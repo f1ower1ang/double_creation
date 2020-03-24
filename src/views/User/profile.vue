@@ -38,19 +38,30 @@
           a.btn(@click="modal1 = true") 点击修改
         li.item
           label 邮箱
-          p.info.no-wrap {{ accountInfo.email }}
+          p.info.no-wrap(:title="accountInfo.email") {{ accountInfo.email }}
           a.btn(@click="modal2 = true") 点击修改
         li.item
           label 密码
           p.info.no-wrap ******
           a.btn(@click="modal3 = true") 点击修改
 
-    Modal(v-model="modal1" @on-ok="changePhone"  title="修改手机")
-    Modal(v-model="modal2" @on-ok="changeEmail"  title="修改邮箱" :loading="true" ref="modal2")
+    Modal(v-model="modal1" @on-ok="changePhone"  title="修改手机" :loading="true" ref="modal1" width="400px")
+      Form(:model="phoneForm" :rules="phoneRule" ref="phoneForm")
+        FormItem(prop="phone")
+          Input(v-model="phoneForm.phone" placeholder="手机")
+            Icon(type="ios-call-outline" slot="prepend" size="20")
+        FormItem(prop="code")
+          Row(:gutter="20")
+            Col(span="16")
+              Input(v-model="phoneForm.code" placeholder="验证码")
+                Icon(type="ios-text-outline" slot="prepend" size="20")
+            Col(span="8")
+              Button(@click="getCode") 点击获取
+    Modal(v-model="modal2" @on-ok="changeEmail"  title="修改邮箱" :loading="true" ref="modal2" width="400px")
       Form(:model="emailForm" :rules="emailRule" ref="emailForm")
         FormItem(label="邮箱" prop="email")
           Input(type="email" v-model="emailForm.email")
-    Modal(v-model="modal3" @on-ok="changePwd" title="修改密码" :loading="true" ref="modal3")
+    Modal(v-model="modal3" @on-ok="changePwd" title="修改密码" :loading="true" ref="modal3" width="400px")
       Form(:model="pwdForm" label-position="top" :rules="pwdRule" ref="pwdForm")
         FormItem(label="当前密码" prop="oldPassword")
           Input(type="password" v-model="pwdForm.oldPassword")
@@ -66,7 +77,8 @@ import { Vue, Component } from 'vue-property-decorator'
 import { Getter } from 'vuex-class'
 import { defaultBaseUrl } from '@/utils/http'
 import path from '@/utils/path'
-import { uploadAvatar, editInfo, getInfo, resetPwd, resetEmail } from '@/api/user'
+import { uploadAvatar, editInfo, resetPwd, resetEmail } from '@/api/user'
+import code, { getPhoneCode } from '@/api/code'
 import { checkImage } from '@/utils/image'
 import { Form } from 'view-design'
 import { User } from '@/utils/formatData'
@@ -91,12 +103,44 @@ export default class Profile extends Vue{
   public $refs!: {
     pwdForm: Form,
     emailForm: Form,
+    phoneForm: Form,
+    modal1: any,
     modal3: any,
     modal2: any
   }
   private modal1: boolean = false
   private modal2: boolean = false
   private modal3: boolean = false
+
+
+  validatePass(rule: any, value: any, callback: any) {
+    if (value === '') {
+      return callback(new Error('请输入新密码'));
+    }
+    if (this.pwdForm.confirmNewPassword.length > 0) {
+      // 对第二个密码框单独验证
+      this.$refs.pwdForm.validateField('confirmNewPassword');
+    }
+    callback()
+  }
+  validatePassCheck(rule: any, value: any, callback: any){
+    if (value === '') {
+      callback(new Error('请输入密码'));
+    } else if (value !== this.pwdForm.newPassword) {
+      callback(new Error('两次输入密码不一致'));
+    } else {
+      callback();
+    }
+  }
+  validatePhone = (rule: any, value: any, callback: any) => {
+    if (value === '') {
+      callback(new Error('请输入手机号'))
+    } else if (value.length > 0 && !/^1[34578]\d{9}$/.test(value)) {
+      callback('手机号格式不正确')
+    } else {
+      callback()
+    }
+  }
 
   private pwdForm: any = {
     oldPassword: '',
@@ -124,27 +168,12 @@ export default class Profile extends Vue{
     ]
   }
   private phoneForm: any = {
-    phone: ''
+    phone: '',
+    code: ''
   }
-
-  validatePass(rule: any, value: any, callback: any) {
-    if (value === '') {
-      return callback(new Error('请输入新密码'));
-    }
-    if (this.pwdForm.confirmNewPassword.length > 0) {
-      // 对第二个密码框单独验证
-      this.$refs.pwdForm.validateField('confirmNewPassword');
-    }
-    callback()
-  }
-  validatePassCheck(rule: any, value: any, callback: any){
-    if (value === '') {
-      callback(new Error('请输入密码'));
-    } else if (value !== this.pwdForm.newPassword) {
-      callback(new Error('两次输入密码不一致'));
-    } else {
-      callback();
-    }
+  private phoneRule: any = {
+    phone: [{ validator: this.validatePhone, trigger: 'blur', required: true }],
+    code: [{ required: true, message: '请输入验证码', trigger: 'blur'}]
   }
 
   @Getter userInfo: User | undefined | null
@@ -200,15 +229,33 @@ export default class Profile extends Vue{
   }
 
   private changePhone() {
+    this.$refs['modal1'].buttonLoading = false
+    this.$refs['phoneForm'].validate((valid: boolean | any) => {
+      if (valid) {
+        this.modal3 = false
+      }
+    })
   }
   private changeEmail() {
     this.$refs['modal2'].buttonLoading = false
     this.$refs['emailForm'].validate((valid: boolean | any) => {
       if (valid) {
+        this.modal2 = false
+        this.emailForm.email = ''
         resetEmail(this.emailForm).then((res: any) => {
-          console.log(res)
-        }).catch((e) => {
-          console.error(e)
+          if (res.errCode === 200) {
+            this.$Message.success({
+              content: '验证邮件发送成功，请前往邮箱验证',
+              duration: 3
+            })
+          } else {
+            this.$Message.warning({
+              content: res.errMsg,
+              duration: 3
+            })
+          }
+        }).catch((e: any) => {
+          this.$Message.error(e.message)
         })
       }
     })
@@ -217,6 +264,12 @@ export default class Profile extends Vue{
     this.$refs['modal3'].buttonLoading = false
     this.$refs['pwdForm'].validate((valid: boolean | any) => {
       if (valid) {
+        this.modal3 = false
+        this.pwdForm = {
+          oldPassword: '',
+          newPassword: '',
+          confirmNewPassword: ''
+        }
         resetPwd(this.pwdForm).then((res: any) => {
           if (res.errCode !== 200) {
             this.$Message.error(res.errMsg)
@@ -232,6 +285,23 @@ export default class Profile extends Vue{
         })
       }
     })
+  }
+
+  private getCode() {
+    if (this.phoneForm.phone === '') {
+      this.$Message.error('请输入手机号码')
+      return
+    } else if (!/^1[34578]\d{9}$/.test(this.phoneForm.phone)) {
+      this.$Message.error('请输入正确的手机号码')
+      return
+    } else {
+      getPhoneCode({
+        phoneNumber: this.phoneForm.phone,
+        smsCode: code.bindPhone
+      }).then((res) => {
+        console.log(res)
+      })
+    }
   }
 }
 </script>

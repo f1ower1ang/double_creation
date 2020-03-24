@@ -22,7 +22,7 @@
                 course-item(v-for="(course, index) in learningList" :key="index" :course="course" @remove="removeRecord(course, index)" :collected="false")
               .mobile
                 course-card(v-for="(course, index) in learningList" :key="index" :course="course")
-              .no-result(v-if="!spinShow && learningList.length === 0")
+              .no-result(v-if="!spinShow && learningList.length === 0" style="margin-top: 100px")
                 p 还没有相关实验记录~
                 router-link(to="/courses") 瞅瞅其他实验
           TabPane(label="收藏课程" name="collectCourse")
@@ -30,9 +30,10 @@
               course-item(v-for="(course, index) in favoriteList" :key="index" :course="course" @remove="removeFavor(course)" :collected="true")
             .mobile(:style="{height: height + 'px', overflow: 'auto', paddingTop: '20px'}" v-if="favoriteList.length > 0")
               course-card(v-for="(course, index) in learningList" :key="index" :course="course")
-            .no-result(v-if="favoriteList.length === 0" style="padding: 20px 0 270px 0")
-              p 还没有相关实验记录~
-              router-link(to="/allCourse") 瞅瞅其他实验
+            .no-result(v-if="favoriteList.length === 0" :style="{height: height + 'px'}")
+              div(style="padding-top: 120px")
+                p 还没有相关实验记录~
+                router-link(to="/allCourse") 瞅瞅其他实验
 </template>
 
 <script lang="ts">

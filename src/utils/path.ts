@@ -27,12 +27,16 @@ export default {
     favoriteList: '/userCollection/getUserCollections',
     addFavorite: '/userCollection/addUserCollection',
     deleteFavorite: '/userCollection/deleteCollection',
-    deleteCourse: '/userCourse/deleteUserCourse'
+    deleteCourse: '/userCourse/deleteUserCourse',
+    verifyToken: '/verifity/verityFoegetPassword',
+    verifyRegister: '/verifity/SignInEmailVerifity',
+    verifyEmail: '/verifity/verityBindEmail'
   },
   code: {
     emailCode: '/verifity/reSendVerifityEmail',
     default: '/verifity/generator',
     verifyCode: '/verifity/match',
-    verifyEmailCode: '/verifity/emailVerifity'
+    verifyEmailCode: '/verifity/emailVerifity',
+    phoneCode: '/sms/reSendSms'
   }
 }

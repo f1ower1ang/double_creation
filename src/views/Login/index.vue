@@ -14,12 +14,21 @@
       .login-page__form-wrapper__footer
         p.text-weak 没有账号？
           router-link(to="/register") 注册
-        router-link(to="/forgetpwd") 忘记密码
+        a(@click="modal = true") 忘记密码
+    Modal(v-model="modal" footer-hide style="text-align: center" width="400px")
+      h2 忘记密码
+      Form(:model="forgetForm" :rules="ruleValidate" style="padding:0 10px")
+        FormItem(prop="email" label="邮箱")
+          Input.login-page__form-wrapper__input(v-model="forgetForm.email" placeholder="请输入账号邮箱" size="large")
+        FormItem
+          Button(type="primary" style="margin-right: 20px" @click="submitEmail") 验证
+          Button(@click="modal = false") 取消
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator'
+import { Vue, Component } from 'vue-property-decorator'
 import { Form } from 'view-design'
+import { sendForgetEmail } from '@/api/user'
 
 @Component
 export default class Register extends Vue {
@@ -38,8 +47,12 @@ export default class Register extends Vue {
     ],
     password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
   }
+  private forgetForm = {
+    email: ''
+  }
   private loginFail: boolean = false
   private logining: boolean = false
+  private modal: boolean = false
 
   private handleLogin() {
     this.$refs['form'].validate((valid: boolean | any) => {
@@ -66,6 +79,22 @@ export default class Register extends Vue {
               this.logining = false
             }
           })
+      }
+    })
+  }
+  private submitEmail() {
+    this.modal = false
+    sendForgetEmail(this.forgetForm).then((res: any) => {
+      if (res.errCode === 200) {
+        this.$Message.success({
+          content: '验证邮件已发送，请查看邮件验证',
+          duration: 3
+        })
+      } else {
+        this.$Message.warning({
+          content: res.errMsg,
+          duration: 3
+        })
       }
     })
   }

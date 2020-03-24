@@ -1,5 +1,6 @@
 import { post, put, get, del } from '@/utils/http'
 import path from '@/utils/path'
+import axios from 'axios'
 // @ts-ignore
 import Qs from 'qs'
 
@@ -67,4 +68,20 @@ export function deleteRecord(recordId: number) {
   return del(path.user.deleteCourse, {
     id: recordId
   })
+}
+
+export function sendForgetEmail(data: object) {
+  return post(path.user.forget, data)
+}
+
+export function verifyToken(data: object) {
+  return axios.post(path.user.verifyToken, data).then((res: any) => Promise.resolve(res.data))
+}
+
+export function verifyRegister(data: object) {
+  return axios.post(path.user.verifyRegister, data).then((res: any) => Promise.resolve(res.data))
+}
+
+export function verifyEmail(data: object) {
+  return put(path.user.verifyEmail, data)
 }

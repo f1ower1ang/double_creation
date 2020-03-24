@@ -1,7 +1,7 @@
 <template lang="pug">
   .register-page
     h1.register-page__title AMOM人工智能实验室
-    Form.register-page__form-wrapper(:model="registerForm" label-position="top" :rules="ruleValidate" @keyup.enter.native="register" ref="form")
+    Form.register-page__form-wrapper(:model="registerForm" label-position="top" :rules="ruleValidate" ref="form")
       FormItem(prop="account")
         Input(v-model="registerForm.account" placeholder="用户名" size="large")
           Icon(type="ios-person-outline" slot="prepend" size="20")
@@ -71,6 +71,15 @@ export default class Register extends Vue {
       callback()
     }
   }
+  validateUsername = (rule: any, value: any, callback: any) => {
+    if (value === '') {
+      callback(new Error('请输入用户名'))
+    } else if (value.length < 6 || value.length > 15) {
+      callback(new Error('长度必须在6和15之间'))
+    } else {
+      callback()
+    }
+  }
 
   public $refs!: {
     form: Form
@@ -85,13 +94,13 @@ export default class Register extends Vue {
     phone: ''
   }
   private ruleValidate: object = {
-    account: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+    account: [{ validator: this.validateUsername, trigger: 'blur' }],
     password: [{ validator: this.validatePass, trigger: 'blur' }],
     email: [
       { required: true, message: '请输入邮箱', trigger: 'blur' },
       { type: 'email', message: '请输入正确的邮箱', trigger: 'blur' }
     ],
-    phone: [{ validator: this.validatePhone, trigger: 'blur' }],
+    phone: [{ validator: this.validatePhone, trigger: 'blur', required: true }],
     confirmPassword: [{ validator: this.validatePassCheck, trigger: 'blur' }],
     code: [{ required: true, message: '请输入邮箱', trigger: 'blur' }]
   }
@@ -129,24 +138,20 @@ export default class Register extends Vue {
                 }).then((res: any) => {
                   if (res.errCode === 200) {
                     setTimeout(() => {
-                      this.$router.push('/login')
-                      window.location.reload()
-                    }, 1000)
-                    this.$Message.success({
-                      content: '注册成功，请先前往邮箱激活账号',
-                      duration: 5
-                    })
+                      this.$router.push('/')
+                    }, 3000)
+                    this.$Message.success('请前往邮箱激活账号')
                   }
                 })
+                this.$Message.success('注册成功')
               }
-              // this.$router.push('/')
             })
             .catch(() => {
               this.$Message.error('检查注册信息是否完整')
             })
         }
       } else {
-        this.$Message.error('将表单填写完整')
+        this.$Message.error('按照正确格式将表单填写完整')
       }
     })
   }
