@@ -122,8 +122,7 @@ export default class Register extends Vue {
         if (this.valid) {
           const data = Object.assign({}, this.registerForm, {
             name: this.registerForm.account,
-            sex: 0,
-            phone: ''
+            sex: 0
           })
           register(data)
             .then((res: any) => {
