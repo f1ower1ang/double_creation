@@ -40,6 +40,9 @@ export default class VerifyRegister extends Vue{
       }
     }).catch((e) => {
       this.info = e.message
+      setTimeout(() => {
+        this.$router.push('/')
+      }, 2000)
     })
   }
 }

@@ -77,7 +77,7 @@ export default class ForgetPwd extends Vue{
               duration: 3
             })
             setTimeout(() => {
-              // this.$router.push('/')
+              this.$router.push('/')
             }, 3000)
           }
         })
