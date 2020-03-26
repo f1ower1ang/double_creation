@@ -20,15 +20,28 @@
       FormItem
         Row
           Col(span="14")
-            Input(v-model="registerForm.code" placeholder="验证码" size="large" @on-blur="validateCode")
+            Input(v-model="registerForm.code" placeholder="验证码" size="large" @on-blur="validateCode('Register')")
           Col(span="9" offset="1" style="height: 40px")
             img(:src="codeImg" height="100%" width="100%" @click="getCode")
-      p.color-red(v-if="!valid && showTip" style="margin-top: -20px; padding-bottom: 5px") 验证码错误
+      p.color-red(v-if="!validRegister && showTipRegister" style="margin-top: -20px; padding-bottom: 5px") 验证码错误
 
       Button(type="primary" @click="register") 注册
       .register-page__form-wrapper__footer
         p.text-weak 已有账号？
           router-link(to="/login") 登录
+        a(@click="showModal") 已注册？没有验证邮件
+    Modal(v-model="modal" @on-ok="resendEmail"  title="重发验证邮件" :loading="true" width="400px" class-name="vertical-center-modal" ok-text="发送" :closable="false" :mask-closable="false" @on-cancel="cancelResend")
+      Form(:model="resendForm" :rules="ruleValidate" ref="resendForm")
+        FormItem(prop="email")
+          Input(type="email" v-model="resendForm.email" size="large" placeholder="邮箱")
+            Icon(type="ios-mail-outline" slot="prepend" size="20")
+        FormItem
+          Row
+            Col(span="14")
+              Input(v-model="resendForm.code" placeholder="验证码" size="large" @on-blur="validateCode('Resend')")
+            Col(span="9" offset="1" style="height: 40px")
+              img(:src="codeImg" height="100%" width="100%" @click="getCode")
+        p.color-red(v-if="!validResend && showTipResend" style="margin-top: -20px; padding-bottom: 5px") 验证码错误
 </template>
 
 <script lang="ts">
@@ -82,7 +95,8 @@ export default class Register extends Vue {
   }
 
   public $refs!: {
-    form: Form
+    form: Form,
+    resendForm: Form
   }
 
   private registerForm: any = {
@@ -109,8 +123,15 @@ export default class Register extends Vue {
   private timer: any = null
   private codeImg: string = ''
   private codeToken: string = ''
-  private valid: boolean = false
-  private showTip: boolean = false
+  private validRegister: boolean = false
+  private showTipRegister: boolean = false
+  private resendForm = {
+    email: '',
+    code: ''
+  }
+  private modal = false
+  private validResend: boolean = false
+  private showTipResend: boolean = false
 
   private created() {
     this.getCode()
@@ -119,7 +140,7 @@ export default class Register extends Vue {
   private register() {
     this.$refs['form'].validate((valid: boolean | any) => {
       if (valid && this.registerForm.code.length > 0) {
-        if (this.valid) {
+        if (this.validRegister) {
           const data = Object.assign({}, this.registerForm, {
             name: this.registerForm.account,
             sex: 0
@@ -132,6 +153,7 @@ export default class Register extends Vue {
                   duration: 5
                 })
               } else {
+                this.$Message.success('注册成功')
                 emailCode({
                   email: this.registerForm.email
                 }).then((res: any) => {
@@ -142,7 +164,6 @@ export default class Register extends Vue {
                     this.$Message.success('请前往邮箱激活账号')
                   }
                 })
-                this.$Message.success('注册成功')
               }
             })
             .catch(() => {
@@ -154,28 +175,81 @@ export default class Register extends Vue {
       }
     })
   }
+  private showModal() {
+    this.modal = true
+    this.getCode()
+  }
+  private resendEmail() {
+    this.$refs['resendForm'].validate((valid: any) => {
+      if (valid && this.resendForm.code.length > 0) {
+        if (this.validResend) {
+          emailCode({
+            email: this.resendForm.email
+          }).then((res: any) => {
+            if (res.errCode === 200) {
+              this.$Message.success('验证邮件发送成功')
+            } else {
+              this.$Message.error(res.errMsg)
+            }
+          }).catch((e) => {
+            this.$Message.error('发送失败，请先注册')
+          })
+          this.resendForm = {
+            email: '',
+            code: ''
+          }
+          this.getCode()
+          this.modal = false
+        } else {
+          this.$Message.warning('验证码填写有误')
+        }
+      } else {
+        this.$Message.warning('补全表单信息')
+      }
+    })
+  }
+  private cancelResend() {
+    this.modal = false
+    this.getCode()
+  }
   private getCode() {
     getCode().then((res: any) => {
       this.codeImg = 'data:images/jpeg;base64,' + res.data.img
       this.codeToken = res.data.sToken
     })
   }
-  private validateCode() {
-    verifyCode({ sToken: this.codeToken, textStr: this.registerForm.code })
+  private validateCode(type: string) {
+    const textStr = type === 'Resend' ? this.resendForm.code : this.registerForm.code
+    verifyCode({ sToken: this.codeToken, textStr })
       .then((res: any) => {
         if (res.errCode !== 200) {
-          this.valid = false
-          this.showTip = true
+          if (type === 'Resend') {
+            this.validResend = false
+            this.showTipResend = true
+          } else {
+            this.validRegister = false
+            this.showTipRegister = true
+          }
           this.getCode()
         } else {
-          this.valid = true
-          this.showTip = false
+          if (type === 'Resend') {
+            this.validResend = true
+            this.showTipResend = false
+          } else {
+            this.validRegister = true
+            this.showTipRegister = false
+          }
         }
       })
       .catch(() => {
         this.getCode()
-        this.valid = false
-        this.showTip = true
+        if (type === 'Resend') {
+          this.validResend = false
+          this.showTipResend = true
+        } else {
+          this.validRegister = false
+          this.showTipRegister = true
+        }
       })
   }
 }

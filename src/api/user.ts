@@ -85,3 +85,9 @@ export function verifyRegister(data: object) {
 export function verifyEmail(data: object) {
   return put(path.user.verifyEmail, data)
 }
+
+export function beforeBindPhone() {
+  return post(path.user.beforePhone)
+}
+
+

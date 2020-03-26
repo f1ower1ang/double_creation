@@ -30,13 +30,21 @@ export default {
     deleteCourse: '/userCourse/deleteUserCourse',
     verifyToken: '/verifity/verityFoegetPassword',
     verifyRegister: '/verifity/SignInEmailVerifity',
-    verifyEmail: '/verifity/verityBindEmail'
+    verifyEmail: '/verifity/verityBindEmail',
+    beforePhone: '/sms/beforeGetBindPhoneNumber',
   },
   code: {
     emailCode: '/verifity/reSendVerifityEmail',
     default: '/verifity/generator',
     verifyCode: '/verifity/match',
     verifyEmailCode: '/verifity/emailVerifity',
-    phoneCode: '/sms/reSendSms'
+    resendPhoneCode: '/sms/reSendSms',
+    phoneCode: '/sms/getBindPhoneNumber',
+    beforePhoneCode: '/sms/beforeGetBindPhoneNumberVerify',
+    checkPhoneCode: '/sms/getBindPhoneNumberVerify',
+    forgetCode: '/sms/sendFPSms',
+    checkForgetCode: '/sms/forgiePasswordSmsVerify',
+    loginCode: '/sms/sendLoginSms',
+    checkLoginCode: '/sms/loginSmsVerify'
   }
 }

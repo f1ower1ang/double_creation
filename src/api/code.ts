@@ -25,6 +25,34 @@ export function verifyEmailCode(data: object) {
   return post(path.code.verifyEmailCode, data)
 }
 
+export function resendPhoneCode(data: object) {
+  return axios.put(path.code.resendPhoneCode, data).then((res: any) => Promise.resolve(res.data))
+}
+
 export function getPhoneCode(data: object) {
-  return axios.put(path.code.phoneCode, data).then((res: any) => Promise.resolve(res.data))
+  return post(path.code.phoneCode, data)
+}
+
+export function checkBeforeBindCode(checkCode: string) {
+  return post(path.code.beforePhoneCode, { checkCode })
+}
+
+export function checkBindCode(data: object) {
+  return put(path.code.checkPhoneCode, data)
+}
+
+export function getForgetCode(mobile: string) {
+  return post(path.code.forgetCode + '?mobile=' + mobile)
+}
+
+export function checkForgetCode(data: object) {
+  return post(path.code.checkForgetCode, data)
+}
+
+export function getLoginCode(mobile: string) {
+  return post(path.code.loginCode + '?mobile=' + mobile)
+}
+
+export function checkLoginCode(data: object) {
+  return post(path.code.checkLoginCode, data)
 }

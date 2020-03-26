@@ -13,7 +13,51 @@
     box-shadow: 0 2px 12px 0 $color-weak;
     background: $color-white;
     width: 100%;
-    padding: 2rem 1.5rem;
+    padding: 0 1.5rem 2rem;
+    &__header {
+      margin: 0 -1.5rem;
+      display: flex;
+      border-bottom: 1px solid #eee;
+      height: 40px;
+      align-items: center;
+      justify-content: center;
+      color: $color-pl;
+      .left, .right {
+        flex: 1;
+        text-align: center;
+        position: relative;
+        height: 40px;
+        line-height: 40px;
+        font-size: $font-size-medium;
+        cursor: pointer;
+        i {
+          vertical-align: middle;
+        }
+        span {
+          font-size: 14px;
+          margin-left: 5px;
+          vertical-align: middle;
+        }
+      }
+      .left {
+        border-right: 1px solid #eee;
+      }
+      .active {
+        color: $color-theme;
+        &:after {
+          content: '';
+          width: 100%;
+          height: 2px;
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          background-color: $color-theme;
+        }
+      }
+    }
+    &__content {
+      margin-top: 20px;
+    }
 
     button {
       width: 100%;

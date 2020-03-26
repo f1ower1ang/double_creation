@@ -35,7 +35,7 @@
         li.item
           label 手机
           p.info.no-wrap {{ accountInfo.phone }}
-          a.btn(@click="modal1 = true") 点击修改
+          a.btn(@click="beforeBind") 点击修改
         li.item
           label 邮箱
           p.info.no-wrap(:title="accountInfo.email") {{ accountInfo.email }}
@@ -45,8 +45,20 @@
           p.info.no-wrap ******
           a.btn(@click="modal3 = true") 点击修改
 
-    Modal(v-model="modal1" @on-ok="changePhone"  title="修改手机" :loading="true" ref="modal1" width="400px")
-      Form(:model="phoneForm" :rules="phoneRule" ref="phoneForm")
+    Modal(v-model="modal1" @on-ok="changePhone"  title="修改手机" :loading="true" ref="modal1" footer-hide width="400px" :mask-closable="false" :closable="false")
+      Form(:model="beforeBindForm" v-if="step === 'beforeBind'")
+        FormItem(prop="code")
+          Row(:gutter="20")
+            Col(span="16")
+              Input(v-model="beforeBindForm.code" placeholder="短信验证码")
+                Icon(type="ios-text-outline" slot="prepend" size="20")
+            Col(span="8")
+              Button(@click="beforeBind" style="width: 100%" v-if="beforeBindForm.time === 60") 点击获取
+              Button(disabled style="width: 100%" v-else) {{ beforeBindForm.time }} s
+        FormItem(style="text-align: right; margin-bottom: 0")
+          Button(style="margin-right: 10px" @click="cancelBind") 取消
+          Button(type="primary" @click="beforeBindValidate") 下一步
+      Form(:model="phoneForm" v-else)
         FormItem(prop="phone")
           Input(v-model="phoneForm.phone" placeholder="手机")
             Icon(type="ios-call-outline" slot="prepend" size="20")
@@ -56,7 +68,11 @@
               Input(v-model="phoneForm.code" placeholder="验证码")
                 Icon(type="ios-text-outline" slot="prepend" size="20")
             Col(span="8")
-              Button(@click="getCode") 点击获取
+              Button(@click="getPhoneCode" style="width: 100%" v-if="phoneForm.time === 60") 点击获取
+              Button(disabled style="width: 100%" v-else) {{ phoneForm.time }} s
+        FormItem(style="text-align: right; margin-bottom: 0")
+          Button(style="margin-right: 10px" @click="cancelBind") 取消
+          Button(type="primary" @click="confirmAmend") 确认修改
     Modal(v-model="modal2" @on-ok="changeEmail"  title="修改邮箱" :loading="true" ref="modal2" width="400px")
       Form(:model="emailForm" :rules="emailRule" ref="emailForm")
         FormItem(label="邮箱" prop="email")
@@ -69,7 +85,6 @@
           Input(type="password" v-model="pwdForm.newPassword")
         FormItem(label="确认密码" prop="confirmNewPassword")
           Input(type="password" v-model="pwdForm.confirmNewPassword")
-
 </template>
 
 <script lang="ts">
@@ -77,8 +92,8 @@ import { Vue, Component } from 'vue-property-decorator'
 import { Getter } from 'vuex-class'
 import { defaultBaseUrl } from '@/utils/http'
 import path from '@/utils/path'
-import { uploadAvatar, editInfo, resetPwd, resetEmail } from '@/api/user'
-import code, { getPhoneCode } from '@/api/code'
+import { uploadAvatar, editInfo, resetPwd, resetEmail, beforeBindPhone } from '@/api/user'
+import code, { checkBeforeBindCode, checkBindCode, getPhoneCode } from '@/api/code'
 import { checkImage } from '@/utils/image'
 import { Form } from 'view-design'
 import { User } from '@/utils/formatData'
@@ -169,12 +184,20 @@ export default class Profile extends Vue{
   }
   private phoneForm: any = {
     phone: '',
-    code: ''
+    code: '',
+    time: 60
   }
   private phoneRule: any = {
     phone: [{ validator: this.validatePhone, trigger: 'blur', required: true }],
     code: [{ required: true, message: '请输入验证码', trigger: 'blur'}]
   }
+
+  private beforeBindForm: any = {
+    code: '',
+    time: 60,
+    token: ''
+  }
+  private step: string = 'beforeBind'
 
   @Getter userInfo: User | undefined | null
 
@@ -225,6 +248,49 @@ export default class Profile extends Vue{
       this.$Message.success('更新成功')
     } catch (e) {
       console.error(e)
+    }
+  }
+
+  private beforeBind() {
+    beforeBindPhone().then((res: any) => {
+      if (res.errCode === 200) {
+        this.$Message.warning({
+          content: '验证短信发送成功'
+        })
+        this.modal1 = true
+        this.beforeBindForm.time = 59
+        let timer = setInterval(() => {
+          this.beforeBindForm.time -= 1
+          if (this.beforeBindForm.time === 0) {
+            clearInterval(timer)
+            this.beforeBindForm.time = 60
+          }
+        }, 1000)
+      }
+    })
+  }
+  beforeBindValidate() {
+    checkBeforeBindCode(this.beforeBindForm.code).then((res: any) => {
+      if (res.errCode === 200) {
+        this.step = 'bindPhone'
+        this.beforeBindForm.token = res.data.token
+      } else {
+        this.$Message.error('验证码错误')
+      }
+    })
+  }
+  private cancelBind() {
+    this.modal1 = false
+    this.step = 'beforeBind'
+    this.beforeBindForm = {
+      code: '',
+      time: 60,
+      token: ''
+    }
+    this.phoneForm = {
+      phone: '',
+      code: '',
+      time: 60
     }
   }
 
@@ -287,19 +353,44 @@ export default class Profile extends Vue{
     })
   }
 
-  private getCode() {
+  private getPhoneCode() {
     if (this.phoneForm.phone === '') {
       this.$Message.error('请输入手机号码')
-      return
     } else if (!/^1[34578]\d{9}$/.test(this.phoneForm.phone)) {
       this.$Message.error('请输入正确的手机号码')
-      return
     } else {
       getPhoneCode({
         phoneNumber: this.phoneForm.phone,
-        smsCode: code.bindPhone
+        token: this.beforeBindForm.token
       }).then((res) => {
-        console.log(res)
+        this.phoneForm.time = 59
+        let timer = setInterval(() => {
+          this.phoneForm.time -= 1
+          if (this.phoneForm.time === 0) {
+            clearInterval(timer)
+            this.phoneForm.time = 60
+          }
+        }, 1000)
+      })
+    }
+  }
+  private confirmAmend() {
+    if (this.phoneForm.phone === '' || this.phoneForm.code === '') {
+      this.$Message.error('请将表单信息填写完整')
+    } else if (!/^1[34578]\d{9}$/.test(this.phoneForm.phone)) {
+      this.$Message.error('请输入正确的手机号码')
+    } else {
+      checkBindCode({
+        phoneNumber: this.phoneForm.phone,
+        checkCode: this.phoneForm.code
+      }).then((res: any) => {
+        if (res.errCode === 200) {
+          this.$Message.success('绑定成功')
+        } else {
+          this.$Message.error(res.errMsg)
+        }
+      }).catch(() => {
+        this.$Message.error('绑定失败, 检查验证码是否正确')
       })
     }
   }
