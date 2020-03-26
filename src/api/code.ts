@@ -45,7 +45,7 @@ export function getForgetCode(mobile: string) {
   return post(path.code.forgetCode + '?mobile=' + mobile)
 }
 
-export function checkForgetCode(data: object) {
+export function checkForgetCode(data: any) {
   return post(path.code.checkForgetCode, data)
 }
 
@@ -53,6 +53,6 @@ export function getLoginCode(mobile: string) {
   return post(path.code.loginCode + '?mobile=' + mobile)
 }
 
-export function checkLoginCode(data: object) {
+export function checkLoginCode(data: any) {
   return post(path.code.checkLoginCode, data)
 }

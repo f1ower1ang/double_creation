@@ -180,7 +180,7 @@ export default class Register extends Vue {
     this.getCode()
   }
   private resendEmail() {
-    this.$refs['resendForm'].validate((valid: any) => {
+    this.$refs.resendForm.validate((valid: any) => {
       if (valid && this.resendForm.code.length > 0) {
         if (this.validResend) {
           emailCode({
@@ -200,7 +200,8 @@ export default class Register extends Vue {
           }
           this.getCode()
           this.modal = false
-        } else {
+        }
+        else {
           this.$Message.warning('验证码填写有误')
         }
       } else {

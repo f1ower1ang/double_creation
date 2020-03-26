@@ -30,19 +30,19 @@ export default class VerifyRegister extends Vue{
   private mounted() {
     verifyRegister(this.verifyInfo).then((res: any) => {
       if (res.errCode === 200) {
-        this.info = '验证成功，3秒后跳转至首页'
+        this.info = '验证成功'
         setToken(res.data.token)
         this.setToken(res.data.token)
         setTimeout(() => {
           this.$router.push('/')
           this.$Notice.success({ title: '登录成功' })
-        }, 3000)
+        }, 1000)
       }
     }).catch((e) => {
       this.info = e.message
       setTimeout(() => {
         this.$router.push('/')
-      }, 2000)
+      }, 1000)
     })
   }
 }

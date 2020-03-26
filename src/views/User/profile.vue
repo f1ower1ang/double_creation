@@ -89,7 +89,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { Getter } from 'vuex-class'
+import { Getter, Action } from 'vuex-class'
 import { defaultBaseUrl } from '@/utils/http'
 import path from '@/utils/path'
 import { uploadAvatar, editInfo, resetPwd, resetEmail, beforeBindPhone } from '@/api/user'
@@ -200,6 +200,7 @@ export default class Profile extends Vue{
   private step: string = 'beforeBind'
 
   @Getter userInfo: User | undefined | null
+  @Action('user/getInfo') getInfo!: () => void
 
   mounted() {
     if (this.userInfo) {
@@ -384,12 +385,15 @@ export default class Profile extends Vue{
         phoneNumber: this.phoneForm.phone,
         checkCode: this.phoneForm.code
       }).then((res: any) => {
+        this.modal1 = false
         if (res.errCode === 200) {
           this.$Message.success('绑定成功')
+          this.getInfo()
         } else {
           this.$Message.error(res.errMsg)
         }
       }).catch(() => {
+        this.modal1 = false
         this.$Message.error('绑定失败, 检查验证码是否正确')
       })
     }
