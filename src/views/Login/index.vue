@@ -177,7 +177,7 @@ export default class Register extends Vue {
             } else {
               this.loginFail = false
               this.$Message.error({
-                content: e,
+                content: '账号不存在',
                 duration: 3
               })
               this.logining = false
