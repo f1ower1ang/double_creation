@@ -47,6 +47,57 @@
   .home__wrapper {
     margin: 0 auto;
   }
+  .home__footer {
+    margin: 0 -20px;
+    padding: 0 20px;
+    background: #fff;
+    box-sizing: border-box;
+    height: 60px;
+    text-align: center;
+    .info {
+      line-height: 60px;
+      li {
+        float: left;
+        padding-right: 10px;
+        color: $color-weak;
+        font-size: $font-size-small-s;
+        position: relative;
+        padding-left: 10px;
+        &:before {
+          content: "";
+          position: absolute;
+          left: 0;
+          width: 1px;
+          height: 30px;
+          top: 50%;
+          transform: translateY(-50%);
+          display: inline-block;
+          background: #eee;
+        }
+        &:first-child {
+          padding-left: 0;
+          &:before {
+            display: none;
+          }
+        }
+      }
+      .police {
+        position: relative;
+        padding-left: 30px;
+        &:after {
+          position: absolute;
+          content: "";
+          top: 50%;
+          transform: translateY(-50%);
+          left: 10px;
+          width: 20px;
+          height: 20px;
+          background: url('../../assets/police.png') no-repeat;
+          background-size: 20px;
+        }
+      }
+    }
+  }
 
   .home__recommend {
     text-align: center;
@@ -107,14 +158,22 @@
         }
       }
     }
+    .home__footer {
+      display: none;
+    }
   }
+
   @media screen and (min-width: 992px) {
     .home__wrapper {
       width: 60%;
-      .home__recommend {
+      .home__common {
         margin-left: -25%;
         margin-right: -25%;
         .home__recommend__item {
+          width: 90%;
+          margin: 0 auto;
+        }
+        .info {
           width: 90%;
           margin: 0 auto;
         }
@@ -124,7 +183,7 @@
   @media screen and (min-width: 1200px) {
     .home__wrapper {
       width: 50%;
-      .home__recommend {
+      .home__common {
         margin-left: -20%;
         margin-right: -20%;
       }

@@ -7,7 +7,6 @@
         keep-alive(v-if="$route.meta.keepAlive")
           router-view
         router-view(v-if="!$route.meta.keepAlive")
-    Footer 尾部
 </template>
 
 <script lang="ts">

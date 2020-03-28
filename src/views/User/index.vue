@@ -82,7 +82,7 @@ export default class User extends Vue{
     this.spinShow = false
   }
   private mounted() {
-    this.height = document.body.clientHeight - 130 - 50 - 170 - 37
+    this.height = document.body.clientHeight - 150 - 60 - 37 - 60
   }
 
   private async handleCourse() {

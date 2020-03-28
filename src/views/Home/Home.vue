@@ -5,7 +5,7 @@
       Button(size="large" type="default" shape="circle" @click="goTo") 立即体验
       Icon(type="ios-arrow-down")
     .home__wrapper
-      .home__recommend
+      .home__common.home__recommend
         h1.home__recommend__title {{ title }}
         .home__recommend__item
           div.header
@@ -15,6 +15,16 @@
             Spin(size="large" fix v-show="spinShow")
             Col(:xs="24" :sm="24" :md="12" v-for="(course, index) in courseList" :key="index")
               course(:course="course")
+    .home__footer
+      .home__wrapper
+        .home__common
+          div.info
+            ul.fix
+              li Copyright © 2020 南昌大学 版权所有
+              li
+                a.text-weak(href="http://beian.miit.gov.cn" target="_blank") 赣ICP备20003695号-1
+              //li.police
+              //  a.text-weak(href="#") 赣公网备 xxxx号
 </template>
 
 <script lang="ts">
